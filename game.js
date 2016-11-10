@@ -55,34 +55,40 @@ var airplane = {
     angle: 0,
     update : function () {  // here we describe the airplane behavior.
         if (pressed[KEY.UP] && this.y > 0){
-            this.rotate(-1); this.y -= 7;
+            this.y -= 7;
             return
         }
         if (pressed[KEY.DOWN] && this.y + this.image.height < canvas.height) {
-            this.rotate(+1); this.y += 7;
+            this.y += 7;
             return
         }
         if ( this.checkIsTheWayIsFree() == false ) { // autopilot
             if (this.y > canvas.height){
-                this.rotate(+1); this.y -= 7;
+                this.y -= 7;
             } else {
-                this.rotate(-1);
                 this.y += 7;
             }
         }
-    },
-    rotate : function (angle) {
-        this.angle = angle;
     },
     checkIsTheWayIsFree : function() {
         return true
     }
 };
 
+function Cloud( type, x, y ){  // constructor of cloud objects
+    this.image = images[type];
+    this.x = x; this.y = y;
+    this.update = function(){
+        this.x -= 6;
+    }
+}
+
 // game preload
 var objects = [];
 objects.push(airplane);
-
+for (var i = 1; i<15; i++){
+    objects.push(new Cloud('heavy_cloud', i*800, Math.round(Math.random()*200)));
+}
 // main game functions
 function updateGame(){
     for (var i in objects){
