@@ -54,8 +54,9 @@ var airplane = {
     x: 0, y: canvas.height/2,
     angle: 0,
     autoPilot: '', iterations: 0,
+    status: 'fly',
     update : function () {  // here we describe the airplane behavior.
-        console.log(this.x);
+        // manual fly
         if (pressed[KEY.UP] && this.y > 0){
             this.y -= 7;
             return
@@ -64,7 +65,7 @@ var airplane = {
             this.y += 7;
             return
         }
-
+        // autopilot
         if (this.iterations > 0){
             switch (this.autoPilot){
                 case 'down': this.y += 7;
@@ -75,13 +76,14 @@ var airplane = {
             this.iterations -= 1;
             return
         }
+        // give autopilot task to avoid clouds
         if ( this.checkIfTheWayIsBlocked() ) {
             if (this.y > canvas.height/4){
                 this.autoPilot = 'up'
             } else {
                 this.autoPilot = 'down'
             }
-            this.iterations = 35;
+            this.iterations = 40;
         }
     },
     checkIfTheWayIsBlocked : function() {
@@ -125,14 +127,39 @@ function renderGame(){
     }
 }
 
-function checkGameScenario(){
+function gameScenario(){
+    switch(this.status){
+        case 'flying':
 
+    }
+}
+gameScenario.status = 'flying';
+
+function distance(obj1, obj2){
+    var x1 = (obj1.x + obj1.image.width)/2;
+    var y1 = (obj1.y + obj1.image.height)/2;
+    var x2 = (obj2.x + obj2.image.width)/2;
+    var y2 = (obj2.y + obj2.image.height)/2;
+    var dx = x1 - x2;
+    var dy = y1 - y2;
+    return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2))
+}
+
+function collisionDetector(){
+    for (var i in objects){
+        var obj = objects[i];
+        if (obj == airplane){ continue }
+        if (distance(airplane, obj) < 50){
+            // Our plane hits something
+        }
+    }
 }
 
 function main(){
     updateGame();
+    collisionDetector();
     renderGame();
-    checkGameScenario();
+    gameScenario();
     if (pressed[KEY.ESC]) {
         scene.fillText('BYE BYE', canvas.width/2, canvas.height/2);
         return;  // stops the game - we don't call 'requestAnimationFrame'
