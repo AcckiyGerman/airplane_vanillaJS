@@ -166,13 +166,16 @@ function collisionDetector(){
         var obj = objects[i];
         if (obj == airplane){ continue }
         if (distance(airplane, obj) < 50){
-            // Our plane hits something
+            // Our plane hits something - now we need to land the airplane
             console.log('COLLISION!');
             airplane.status = 'burning';
             airplane.update = landing;
             for (var i = 1; i<15; i++){
-    objects.unshift(new Road(500 + i*images.road.width, canvas.height - images.road.height));
-}
+                // adding landing road:
+                objects.unshift(
+                    new Road(800 + i*images.road.width, canvas.height - images.road.height)
+                );
+            }
         }
     }
 }
