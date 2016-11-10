@@ -20,8 +20,10 @@ function onKeyUp(event){
 
 // loading sprites
 var images = {};
+images.BG = new Image();
+images.BG.src = 'assets/background.png';
 images.airplane = new Image();
-images.airplane.src = 'assets/airplane.png';
+images.airplane.src = 'assets/airplane2.png';
 images.cloud1 = new Image();
 images.cloud1.src = 'assets/heavy_cloud.png';
 images.cloud2 = new Image();
@@ -85,7 +87,7 @@ var airplane = {
 };
 // this function will replace airplane.update() after hitting the cloud
 function landing(){
-    if (airplane.y + airplane.image.height < canvas.height-20){
+    if (airplane.y + airplane.image.height < canvas.height){
         airplane.y += 1;
         airplane.x += 1;
     } else { gameover = true }
@@ -131,8 +133,9 @@ function updateGame(){
     }
 }
 
-function renderObjects(){
-    scene.clearRect(0, 0, canvas.width, canvas.height);
+function renderGame(){
+    scene.drawImage(images.BG, 0, 0);
+    //scene.clearRect(0, 0, canvas.width, canvas.height);
     for (var i in objects){
         scene.drawImage(objects[i].image, objects[i].x, objects[i].y);
     }
@@ -177,7 +180,7 @@ function collisionDetector(){
 function main(){
     updateGame();
     collisionDetector();
-    renderObjects();
+    renderGame();
     renderParticles();
     if (pressed[KEY.ESC]) {
         scene.fillText('BYE BYE', canvas.width/2, canvas.height/2);
