@@ -139,7 +139,7 @@ function updateGame(){
     var lastCloud = objects[objects.length-1];
     if (lastCloud.x + lastCloud.image.width < 0 &&
         airplane.status != 'burning' ){ // in that case game is finishing anyway
-            objects.push(new Cloud('cloud1', canvas.width, airplane.y-50));
+            objects.push(new Cloud('cloud2', canvas.width, airplane.y-50));
             // and let's switch off airplane ability to avoid cloud
             airplane.update = function(){};
     }
@@ -159,10 +159,10 @@ function particlesRender(){
 }
 
 function distance(obj1, obj2){
-    var x1 = (obj1.x + obj1.image.width)/2;
-    var y1 = (obj1.y + obj1.image.height)/2;
-    var x2 = (obj2.x + obj2.image.width)/2;
-    var y2 = (obj2.y + obj2.image.height)/2;
+    var x1 = (obj1.x + obj1.image.width/2);
+    var y1 = (obj1.y + obj1.image.height/2);
+    var x2 = (obj2.x + obj2.image.width/2);
+    var y2 = (obj2.y + obj2.image.height/2);
     var dx = x1 - x2;
     var dy = y1 - y2;
     return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2))
@@ -173,7 +173,7 @@ function collisionDetector(){
     for (var j in objects){
         var obj = objects[j];
         if (obj == airplane){ continue }
-        if (distance(airplane, obj) < 50){
+        if (distance(airplane, obj) < 70){
             // Our plane hits something - now we need to land the airplane
             console.log('COLLISION!');
             airplane.status = 'burning';
