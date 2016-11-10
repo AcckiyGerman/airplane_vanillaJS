@@ -3,34 +3,19 @@ var canvas = document.getElementById('Canvas');
 var scene = canvas.getContext('2d');
 scene.font = "20pt Arial";
 
-// game variables
-var gameover = false;
-
 // control
-var KEY = {
-    UP: 38,
-    DOWN: 40,
-    ESC: 27
-};
+var KEY = {UP: 38, DOWN: 40, ESC: 27};
 var pressed = {};
-var mouseY = 0;
-
 document.addEventListener('keydown', onKeyDown, false);
 document.addEventListener('keyup', onKeyUp, false);
-canvas.addEventListener('mousemove', onMouseMove, false);
 
 function onKeyDown(event){
     pressed[event.keyCode] = true;
     event.preventDefault();
 }
-
 function onKeyUp(event){
     pressed[event.keyCode] = false;
     event.preventDefault();
-}
-
-function onMouseMove(event){
-	mouseY = event.clientY;
 }
 
 // loading sprites
@@ -98,23 +83,22 @@ var airplane = {
         return false
     }
 };
-
 // this function will replace airplane.update() after hitting the cloud
 function landing(){
     if (airplane.y + airplane.image.height < canvas.height-20){
         airplane.y += 1;
+        airplane.x += 1;
     } else { gameover = true }
 }
-
-
-function Cloud( type, x, y ){  // constructor of clouds
+// cloud constructor
+function Cloud( type, x, y ){
     this.image = images[type];
     this.x = x; this.y = y;
     this.update = function(){
         this.x -= 6;
     }
 }
-
+// road constructor
 function Road(x, y){
     this.image = images.road;
     this.x = x; this.y = y;
@@ -123,12 +107,14 @@ function Road(x, y){
     }
 }
 
-// game preload
+// preloading game objects
+var gameover = false;
 var objects = [];
 objects.push(airplane);
 for (var i = 1; i<15; i++){
     objects.push(new Cloud('cloud1', i*800, Math.round(Math.random()*300)));
 }
+
 // main game functions
 function updateGame(){
     for (var i in objects){
@@ -145,14 +131,14 @@ function updateGame(){
     }
 }
 
-function renderGame(){
+function renderObjects(){
     scene.clearRect(0, 0, canvas.width, canvas.height);
     for (var i in objects){
         scene.drawImage(objects[i].image, objects[i].x, objects[i].y);
     }
 }
 
-function particlesRender(){
+function renderParticles(){
     if (airplane.status == 'burning'){
         scene.drawImage(images.fire, airplane.x, airplane.y)
     }
@@ -175,13 +161,13 @@ function collisionDetector(){
         if (obj == airplane){ continue }
         if (distance(airplane, obj) < 70){
             // Our plane hits something - now we need to land the airplane
-            console.log('COLLISION!');
             airplane.status = 'burning';
             airplane.update = landing;
-            for (var i = 1; i<15; i++){
-                // adding landing road:
+            for (var i = 1; i<18; i++){
+                // add landing road:
+                // do it with unshift, otherwise road will cover the airplane while landing
                 objects.unshift(
-                    new Road(800 + i*images.road.width, canvas.height - images.road.height)
+                    new Road(600 + i*images.road.width, canvas.height - images.road.height)
                 );
             }
         }
@@ -191,14 +177,14 @@ function collisionDetector(){
 function main(){
     updateGame();
     collisionDetector();
-    renderGame();
-    particlesRender();
+    renderObjects();
+    renderParticles();
     if (pressed[KEY.ESC]) {
         scene.fillText('BYE BYE', canvas.width/2, canvas.height/2);
         return;  // stops the game - we don't call 'requestAnimationFrame'
     }
     if (gameover){
-        alert('BE CAREFUL ON THE FLY');
+        alert('BE CAREFUL WHILE FLYING');
         document.location.reload();
     }
     requestAnimationFrame(main);  // continues the game
