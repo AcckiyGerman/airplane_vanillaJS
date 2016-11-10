@@ -99,6 +99,14 @@ var airplane = {
     }
 };
 
+// this function will replace airplane.update() after hitting the cloud
+function landing(){
+    if (airplane.y + airplane.image.height < canvas.height-7){
+        airplane.y += 1;
+    } else { gameover = true }
+}
+
+
 function Cloud( type, x, y ){  // constructor of clouds
     this.image = images[type];
     this.x = x; this.y = y;
@@ -151,7 +159,7 @@ function collisionDetector(){
             // Our plane hits something
             console.log('COLLISION!');
             airplane.status = 'burning';
-            airplane.update = function(){};
+            airplane.update = landing;
         }
     }
 }
