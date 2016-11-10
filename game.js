@@ -55,7 +55,7 @@ var airplane = {
     angle: 0,
     autoPilot: '', iterations: 0,
     update : function () {  // here we describe the airplane behavior.
-        console.log(this.autoPilot);
+        console.log(this.x);
         if (pressed[KEY.UP] && this.y > 0){
             this.y -= 7;
             return
@@ -125,9 +125,14 @@ function renderGame(){
     }
 }
 
+function checkGameScenario(){
+
+}
+
 function main(){
     updateGame();
     renderGame();
+    checkGameScenario();
     if (pressed[KEY.ESC]) {
         scene.fillText('BYE BYE', canvas.width/2, canvas.height/2);
         return;  // stops the game - we don't call 'requestAnimationFrame'
