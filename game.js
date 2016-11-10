@@ -54,7 +54,7 @@ var airplane = {
     x: 0, y: canvas.height/2,
     angle: 0,
     autoPilot: '', iterations: 0,
-    status: 'fly',
+    status: 'flying',
     update : function () {  // here we describe the airplane behavior.
         // manual fly
         if (pressed[KEY.UP] && this.y > 0){
@@ -127,13 +127,11 @@ function renderGame(){
     }
 }
 
-function gameScenario(){
-    switch(this.status){
-        case 'flying':
-
+function particlesRender(){
+    if (airplane.status == 'burning'){
+        scene.drawImage(images.fire, airplane.x, airplane.y)
     }
 }
-gameScenario.status = 'flying';
 
 function distance(obj1, obj2){
     var x1 = (obj1.x + obj1.image.width)/2;
@@ -151,6 +149,9 @@ function collisionDetector(){
         if (obj == airplane){ continue }
         if (distance(airplane, obj) < 50){
             // Our plane hits something
+            console.log('COLLISION!');
+            airplane.status = 'burning';
+            airplane.update = function(){};
         }
     }
 }
@@ -159,7 +160,7 @@ function main(){
     updateGame();
     collisionDetector();
     renderGame();
-    gameScenario();
+    particlesRender();
     if (pressed[KEY.ESC]) {
         scene.fillText('BYE BYE', canvas.width/2, canvas.height/2);
         return;  // stops the game - we don't call 'requestAnimationFrame'
