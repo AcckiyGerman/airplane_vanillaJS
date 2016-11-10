@@ -45,7 +45,6 @@ images.heavy_cloud.src = 'assets/heavy_cloud.png';
 images.fire = new Image();
 images.fire.src = 'assets/fire.png';
 images.road = new Image();
-
 images.road.src = 'assets/road.jpg';
 
 // game objects
@@ -61,16 +60,18 @@ var airplane = {
             this.y -= 7;
             return
         }
-        if (pressed[KEY.DOWN] && this.y + this.image.height < canvas.height) {
+        if (pressed[KEY.DOWN] && this.y + this.image.height < canvas.height-40) {
             this.y += 7;
             return
         }
         // autopilot
         if (this.iterations > 0){
             switch (this.autoPilot){
-                case 'down': this.y += 7;
+                case 'down':
+                    if(this.y < canvas.height-40){ this.y += 7 };
                     break;
-                case 'up': this.y -= 7;
+                case 'up':
+                    if(this.y > 7){this.y -= 7};
                     break;
                 }
             this.iterations -= 1;
@@ -101,7 +102,7 @@ var airplane = {
 
 // this function will replace airplane.update() after hitting the cloud
 function landing(){
-    if (airplane.y + airplane.image.height < canvas.height-7){
+    if (airplane.y + airplane.image.height < canvas.height-20){
         airplane.y += 1;
     } else { gameover = true }
 }
@@ -111,6 +112,14 @@ function Cloud( type, x, y ){  // constructor of clouds
     this.image = images[type];
     this.x = x; this.y = y;
     this.update = function(){
+        this.x -= 6;
+    }
+}
+
+function Road(x, y){
+    this.image = images.road;
+    this.x = x; this.y = y;
+    this.update = function () {
         this.x -= 6;
     }
 }
@@ -152,6 +161,7 @@ function distance(obj1, obj2){
 }
 
 function collisionDetector(){
+    if (airplane.status != 'burning')  // no sense to check collision - plane already landing
     for (var i in objects){
         var obj = objects[i];
         if (obj == airplane){ continue }
@@ -160,6 +170,9 @@ function collisionDetector(){
             console.log('COLLISION!');
             airplane.status = 'burning';
             airplane.update = landing;
+            for (var i = 1; i<15; i++){
+    objects.unshift(new Road(500 + i*images.road.width, canvas.height - images.road.height));
+}
         }
     }
 }
