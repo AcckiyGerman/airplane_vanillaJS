@@ -51,9 +51,11 @@ images.road.src = 'assets/road.jpg';
 // game objects
 var airplane = {
     image : images.airplane,
-    x: 0, y: 0,
+    x: 0, y: canvas.height/2,
     angle: 0,
+    autoPilot: '', iterations: 0,
     update : function () {  // here we describe the airplane behavior.
+        console.log(this.autoPilot);
         if (pressed[KEY.UP] && this.y > 0){
             this.y -= 7;
             return
@@ -62,20 +64,40 @@ var airplane = {
             this.y += 7;
             return
         }
-        if ( this.checkIsTheWayIsFree() == false ) { // autopilot
-            if (this.y > canvas.height){
-                this.y -= 7;
+
+        if (this.iterations > 0){
+            switch (this.autoPilot){
+                case 'down': this.y += 7;
+                    break;
+                case 'up': this.y -= 7;
+                    break;
+                }
+            this.iterations -= 1;
+            return
+        }
+        if ( this.checkIfTheWayIsBlocked() ) {
+            if (this.y > canvas.height/4){
+                this.autoPilot = 'up'
             } else {
-                this.y += 7;
+                this.autoPilot = 'down'
             }
+            this.iterations = 35;
         }
     },
-    checkIsTheWayIsFree : function() {
-        return true
+    checkIfTheWayIsBlocked : function() {
+        for (var j in objects){
+            var obj = objects[j];
+            if (obj != this &&  // can't hit myself
+                obj.x > 0 + this.image.width &&  // cloud is ahead
+                obj.x < canvas.width/2 &&  // cloud is not too far
+                this.y < obj.y + obj.image.height &&
+                this.y + this.image.height > obj.y ){ return true }
+        }
+        return false
     }
 };
 
-function Cloud( type, x, y ){  // constructor of cloud objects
+function Cloud( type, x, y ){  // constructor of clouds
     this.image = images[type];
     this.x = x; this.y = y;
     this.update = function(){
@@ -87,7 +109,7 @@ function Cloud( type, x, y ){  // constructor of cloud objects
 var objects = [];
 objects.push(airplane);
 for (var i = 1; i<15; i++){
-    objects.push(new Cloud('heavy_cloud', i*800, Math.round(Math.random()*200)));
+    objects.push(new Cloud('heavy_cloud', i*800, Math.round(Math.random()*300)));
 }
 // main game functions
 function updateGame(){
