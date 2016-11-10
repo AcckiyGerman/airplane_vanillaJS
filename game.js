@@ -1,11 +1,10 @@
 // loading canvas
 var canvas = document.getElementById('Canvas');
 var scene = canvas.getContext('2d');
-scene.font = "14pt Arial";
+scene.font = "20pt Arial";
 
 // game variables
 var gameover = false;
-var frame = 0;
 
 // control
 var KEY = {
@@ -38,10 +37,10 @@ function onMouseMove(event){
 var images = {};
 images.airplane = new Image();
 images.airplane.src = 'assets/airplane.png';
-images.cloud = new Image();
-images.cloud.src = 'assets/cloud.png';
-images.heavy_cloud = new Image();
-images.heavy_cloud.src = 'assets/heavy_cloud.png';
+images.cloud1 = new Image();
+images.cloud1.src = 'assets/heavy_cloud.png';
+images.cloud2 = new Image();
+images.cloud2.src = 'assets/cloud.png';
 images.fire = new Image();
 images.fire.src = 'assets/fire.png';
 images.road = new Image();
@@ -59,8 +58,8 @@ var airplane = {
         if (pressed[KEY.UP] && this.y > 0){
             this.y -= 7;
             return
-        }
-        if (pressed[KEY.DOWN] && this.y + this.image.height < canvas.height-40) {
+        } else if (pressed[KEY.DOWN] &&
+                    this.y + this.image.height < canvas.height-40) {
             this.y += 7;
             return
         }
@@ -128,12 +127,21 @@ function Road(x, y){
 var objects = [];
 objects.push(airplane);
 for (var i = 1; i<15; i++){
-    objects.push(new Cloud('heavy_cloud', i*800, Math.round(Math.random()*300)));
+    objects.push(new Cloud('cloud1', i*800, Math.round(Math.random()*300)));
 }
 // main game functions
 function updateGame(){
     for (var i in objects){
         objects[i].update();
+    }
+    // also we need to check if is it time to finish the game?
+    // after 14 clouds we need to hit the 15th and land the airplane
+    var lastCloud = objects[objects.length-1];
+    if (lastCloud.x + lastCloud.image.width < 0 &&
+        airplane.status != 'burning' ){ // in that case game is finishing anyway
+            objects.push(new Cloud('cloud1', canvas.width, airplane.y-50));
+            // and let's switch off airplane ability to avoid cloud
+            airplane.update = function(){};
     }
 }
 
@@ -162,8 +170,8 @@ function distance(obj1, obj2){
 
 function collisionDetector(){
     if (airplane.status != 'burning')  // no sense to check collision - plane already landing
-    for (var i in objects){
-        var obj = objects[i];
+    for (var j in objects){
+        var obj = objects[j];
         if (obj == airplane){ continue }
         if (distance(airplane, obj) < 50){
             // Our plane hits something - now we need to land the airplane
