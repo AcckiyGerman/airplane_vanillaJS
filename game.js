@@ -34,15 +34,18 @@ images.road = new Image();
 images.road.src = 'assets/road.jpg';
 
 // sound
-var audio = new Audio();
-audio.preload = 'auto';
-audio.src = 'assets/bg-sound.mp3';
+var audio = {};
+audio.engine = new Audio();
+audio.engine.src = 'assets/engine.mp3';
+audio.burning = new Audio();
+audio.burning.preload = 'auto';
+audio.burning.src = 'assets/burning.mp3';
 
 // game objects
 var airplane = {
     image : images.airplane,
     x: 0, y: canvas.height/2,
-    angle: 0,
+    speed: 1,
     autoPilot: '', iterations: 0,
     status: 'flying',
     update : function () {  // here we describe the airplane behavior.
@@ -51,7 +54,7 @@ var airplane = {
             this.y -= 7;
             return
         } else if (pressed[KEY.DOWN] &&
-                    this.y + this.image.height < canvas.height-40) {
+                    this.y + this.image.height < canvas.height-100) {
             this.y += 7;
             return
         }
@@ -59,7 +62,7 @@ var airplane = {
         if (this.iterations > 0){
             switch (this.autoPilot){
                 case 'down':
-                    if(this.y < canvas.height-40){ this.y += 7 };
+                    if(this.y < canvas.height-80){ this.y += 7 };
                     break;
                 case 'up':
                     if(this.y > 7){this.y -= 7};
@@ -93,9 +96,16 @@ var airplane = {
 // this function will replace airplane.update() after hitting the cloud
 function landing(){
     if (airplane.y + airplane.image.height < canvas.height){
-        airplane.y += 1;
-        airplane.x += 1;
-    } else { gameover = true }
+        airplane.y += 0.8;
+        airplane.x += airplane.speed;
+    } else if (airplane.speed > 0){
+        audio.burning.pause();
+        airplane.speed -= 0.01;
+        airplane.x += airplane.speed;
+    } else {
+        gameover = true;
+
+    }
 }
 // cloud constructor
 function Cloud( type, x, y ){
@@ -119,8 +129,9 @@ var gameover = false;
 var objects = [];
 objects.push(airplane);
 for (var i = 1; i<15; i++){
-    objects.push(new Cloud('cloud1', i*800, Math.round(Math.random()*300)));
+    objects.push(new Cloud('cloud1', i*500, Math.round(Math.random()*400)));
 }
+audio.engine.play();
 
 // main game functions
 function updateGame(){
@@ -140,7 +151,7 @@ function updateGame(){
 
 function renderGame(){
     scene.drawImage(images.BG, 0, 0);
-    //scene.clearRect(0, 0, canvas.width, canvas.height);
+
     for (var i in objects){
         scene.drawImage(objects[i].image, objects[i].x, objects[i].y);
     }
@@ -170,12 +181,14 @@ function collisionDetector(){
         if (distance(airplane, obj) < 70){
             // Our plane hits something - now we need to land the airplane
             airplane.status = 'burning';
+            audio.burning.play();
+            audio.engine.pause();
             airplane.update = landing;
-            for (var i = 1; i<18; i++){
+            for (var i = 1; i<25; i++){
                 // add landing road:
                 // do it with unshift, otherwise road will cover the airplane while landing
                 objects.unshift(
-                    new Road(600 + i*images.road.width, canvas.height - images.road.height)
+                    new Road(800 + i*images.road.width, canvas.height - images.road.height)
                 );
             }
         }
@@ -188,7 +201,10 @@ function main(){
     renderGame();
     renderParticles();
     if (pressed[KEY.ESC]) {
+        //alert('BYE BYE');
         scene.fillText('BYE BYE', canvas.width/2, canvas.height/2);
+        audio.engine.pause();
+        audio.burning.pause();
         return;  // stops the game - we don't call 'requestAnimationFrame'
     }
     if (gameover){
