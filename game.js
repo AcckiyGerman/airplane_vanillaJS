@@ -100,6 +100,11 @@ function landing(){
         airplane.x += airplane.speed;
     } else if (airplane.speed > 0){
         audio.burning.pause();
+        airplane.status = 'landed';
+        Road.prototype.update = function(){
+            this.x -= 3;
+        };
+
         airplane.speed -= 0.01;
         airplane.x += airplane.speed;
     } else {
@@ -111,18 +116,18 @@ function landing(){
 function Cloud( type, x, y ){
     this.image = images[type];
     this.x = x; this.y = y;
-    this.update = function(){
-        this.x -= 6;
-    }
 }
+Cloud.prototype.update = function(){
+    this.x -= 6;
+};
 // road constructor
 function Road(x, y){
     this.image = images.road;
     this.x = x; this.y = y;
-    this.update = function () {
-        this.x -= 6;
-    }
 }
+Road.prototype.update = function () {
+    this.x -= 6;
+};
 
 // preloading game objects
 var gameover = false;
@@ -174,7 +179,8 @@ function distance(obj1, obj2){
 }
 
 function collisionDetector(){
-    if (airplane.status != 'burning')  // no sense to check collision - plane already landing
+    if (airplane.status != 'burning'
+        && airplane.status != 'landed')  // no sense to check collision - plane already landing
     for (var j in objects){
         var obj = objects[j];
         if (obj == airplane){ continue }
@@ -184,6 +190,11 @@ function collisionDetector(){
             audio.burning.play();
             audio.engine.pause();
             airplane.update = landing;
+            Cloud.prototype.update = function(){
+                this.x -= 6;
+                // plane goes down - clouds going up!
+                this.y -= 0.6;
+            };
             for (var i = 1; i<25; i++){
                 // add landing road:
                 // do it with unshift, otherwise road will cover the airplane while landing
