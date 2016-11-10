@@ -33,6 +33,11 @@ images.fire.src = 'assets/fire.png';
 images.road = new Image();
 images.road.src = 'assets/road.jpg';
 
+// sound
+var audio = new Audio();
+audio.preload = 'auto';
+audio.src = 'assets/bg-sound.mp3';
+
 // game objects
 var airplane = {
     image : images.airplane,
