@@ -147,7 +147,7 @@ function updateGame(){
     // after 14 clouds we need to hit the 15th and land the airplane
     var lastCloud = objects[objects.length-1];
     if (lastCloud.x + lastCloud.image.width < 0 &&
-        airplane.status != 'burning' ){ // in that case game is finishing anyway
+        airplane.status == 'flying' ){ // in that case game is finishing anyway
             objects.push(new Cloud('cloud2', canvas.width, airplane.y-50));
             // and let's switch off airplane ability to avoid cloud
             airplane.update = function(){};
@@ -179,8 +179,7 @@ function distance(obj1, obj2){
 }
 
 function collisionDetector(){
-    if (airplane.status != 'burning'
-        && airplane.status != 'landed')  // no sense to check collision - plane already landing
+    if (airplane.status == 'flying')  // no sense to check collision - plane already landing
     for (var j in objects){
         var obj = objects[j];
         if (obj == airplane){ continue }
