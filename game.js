@@ -220,6 +220,7 @@ function main(){
     if (gameover){
         alert('BE CAREFUL WHILE FLYING');
         document.location.reload();
+        return
     }
     requestAnimationFrame(main);  // continues the game
 }
